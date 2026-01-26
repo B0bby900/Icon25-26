@@ -1,3 +1,6 @@
+**ICON25-26**
+---
+
 *Repository per il progetto di Ingegneria della Conoscenza realizzato da:*
 
 - **Palmitessa Alessandro (Matricola: 800148)**
