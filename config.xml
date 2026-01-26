@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <dataset>
-        <file_ohlc>data/FB (3) (1).csv</file_ohlc>
-        <file_metrics>data/facebook-dataset (1).csv</file_metrics>
+        <file_ohlc>data/FB.csv</file_ohlc>
+        <file_metrics>data/facebook-dataset.csv</file_metrics>
     </dataset>
     <parameters>
         <kmeans_clusters>4</kmeans_clusters>
@@ -10,7 +10,7 @@
         <volatility_threshold>0.03</volatility_threshold>
     </parameters>
     <output>
-        <facts_path>knowledge_base/facts.pl</facts_path>
+        <facts_path>knowledge_base/rules.pl</facts_path>
     </output>
 </configuration>
 
