@@ -40,8 +40,8 @@ def main():
     disc_df = engine.get_discrete_data()
     bn_engine = BayesEngine(disc_df)
     bn_engine.build_discrete_network()
-    bn_engine.inference(volume_state='High', vol_state='Volatile')
-
+    bn_engine.inference(volume_state='High', vol_state='High_Vol')
+    
 if __name__ == "__main__":
     main()
 
