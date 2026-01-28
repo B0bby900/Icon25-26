@@ -11,11 +11,11 @@ class DataEngine:
         """Carica e unisce i dataset di Facebook."""
         # Caricamento dati OHLC
         df1 = pd.read_csv(self.ohlc_path)
-        df1['Date'] = pd.to_datetime(df1['Date']) # Conversione esplicita sulla colonna Date
+        df1['Date'] = pd.to_datetime(df1['Date']) 
         
         # Caricamento dati Metriche (con Profitto)
         df2 = pd.read_csv(self.metrics_path)
-        df2['Date'] = pd.to_datetime(df2['Date']) # Conversione esplicita sulla colonna Date
+        df2['Date'] = pd.to_datetime(df2['Date']) 
         
         # Merge dei dataset
         self.df = pd.merge(df1, df2, on='Date', how='inner', suffixes=('', '_metric'))
@@ -32,8 +32,6 @@ class DataEngine:
 
     def _add_technical_features(self):
         """Aggiunge indicatori tecnici per l'analisi."""
-        # CORREZIONE: Assegniamo i risultati a nuove colonne ('SMA_7', 'SMA_30', ecc.)
-        # invece di sovrascrivere self.df (che cancellerebbe tutti i dati precedenti).
         
         # Medie Mobili (SMA)
         self.df['SMA_7'] = self.df['Close'].rolling(window=7).mean()
@@ -55,15 +53,16 @@ class DataEngine:
         """Discretizza le variabili continue per la Rete Bayesiana Discreta."""
         disc_df = self.df.copy()
         
-        # Discretizzazione Volume (Terzili)
-        disc_df['Volume_Cat'] = pd.qcut(disc_df['Volume'], 3, labels=['Low', 'Medium', 'High'])
+        # 1. Volume: 3 stati -> {Basso, Medio, Alto}
+        disc_df['Volume_Cat'] = pd.qcut(disc_df['Volume'], 3, labels=['Basso', 'Medio', 'Alto'])
         
-        # Discretizzazione Volatilità
-        # CORREZIONE: Aggiunta la lista labels mancante
-        disc_df['Vol_Cat'] = pd.qcut(disc_df['Volatility_Idx'], 3, labels=['Low_Vol', 'Mid_Vol', 'High_Vol'])
+        # 2. Volatilità: 2 stati -> {Calma, Agitata}
+        disc_df['Vol_Cat'] = pd.qcut(disc_df['Volatility_Idx'], 2, labels=['Calma', 'Agitata'])
         
-        # Discretizzazione Profitto
-        # Usiamo Log_Return creato sopra per definire Gain o Loss
-        disc_df['Profit_Cat'] = disc_df['Log_Return'].apply(lambda x: 'Gain' if x > 0 else 'Loss')
+        # 3. Profitto: 3 stati -> {Perdita, Neutro, Guadagno}
+        disc_df['Profit_Cat'] = pd.qcut(disc_df['Log_Return'], 3, labels=['Perdita', 'Neutro', 'Guadagno'])
+        
+        # 4. Trend: Variabile derivata -> {Rialzista, Ribassista}
+        disc_df['Trend_Cat'] = np.where(disc_df['SMA_7'] > disc_df['SMA_30'], 'Rialzista', 'Ribassista')
         
         return disc_df
