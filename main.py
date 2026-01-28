@@ -33,16 +33,17 @@ def main():
     
     # 3. Machine Learning (Supervisionato & Non Supervisionato)
     learner = Learner(df)
-    df_clustered = learner.unsupervised_clustering() # Genera grafico
+    df_clustered = learner.unsupervised_clustering() 
     learner.supervised_prediction()
     
     # 4. Ragionamento Probabilistico (Bayesian Network)
     disc_df = engine.get_discrete_data()
     bn_engine = BayesEngine(disc_df)
     bn_engine.build_discrete_network()
-    bn_engine.inference(volume_state='High', vol_state='High_Vol')
+    
+    # Eseguiamo un'inferenza con i NOMI IN ITALIANO
+    # Scenario: Volume Alto, Volatilità Agitata, Trend Rialzista
+    bn_engine.inference(volume_state='Alto', vol_state='Agitata', trend_state='Rialzista')
     
 if __name__ == "__main__":
     main()
-
-
