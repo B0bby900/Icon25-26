@@ -3,6 +3,7 @@ from pgmpy.estimators import MaximumLikelihoodEstimator
 from pgmpy.inference import VariableElimination
 import pandas as pd
 import numpy as np
+import logging
 
 class BayesEngine:
     def __init__(self, discrete_df):
@@ -11,36 +12,31 @@ class BayesEngine:
 
     def build_discrete_network(self):
         """Costruisce e addestra una Rete Bayesiana Discreta."""
+        
+        # ZITTIAMO I LOG AUTOMATICI DI PGMPY
+        logging.getLogger("pgmpy").setLevel(logging.ERROR)
+
         # Definizione Struttura (Volume -> Volatilità -> Profitto)
         self.model = DiscreteBayesianNetwork([
             ('Volume_Cat', 'Vol_Cat'),
             ('Vol_Cat', 'Profit_Cat')
         ])
         
-        # --- FIX DEFINITIVO PER I TIPI DI DATI ---
-        # Creiamo un DataFrame vuoto
+        # Preparazione dati
         training_data = pd.DataFrame()
         
-        # Copiamo le colonne necessarie forzando DUE conversioni:
-        # 1. .astype(str) -> Trasforma categorie/numeri in testo
-        # 2. .astype(object) -> Trasforma il testo in "oggetti Python" (ciò che vuole pgmpy)
         try:
             training_data['Volume_Cat'] = self.df['Volume_Cat'].astype(str).astype(object)
             training_data['Vol_Cat'] = self.df['Vol_Cat'].astype(str).astype(object)
             training_data['Profit_Cat'] = self.df['Profit_Cat'].astype(str).astype(object)
         except KeyError as e:
             print(f"ERRORE CRITICO: Manca la colonna {e} nel dataset!")
-            print("Verifica di aver chiamato 'get_discrete_data()' nel main.py")
             return
 
-        print("Tipi di dati per pgmpy:", training_data.dtypes) # Debug per confermare
-
         # Apprendimento Parametri (MLE)
-        print("Addestramento Rete Bayesiana in corso...")
         self.model.fit(training_data, estimator=MaximumLikelihoodEstimator)
         
         assert self.model.check_model()
-        print("Rete Bayesiana addestrata con successo.")
 
     def inference(self, volume_state='High', vol_state='High_Vol'):
         """Esegue inferenza probabilistica."""
