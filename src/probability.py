@@ -16,10 +16,11 @@ class BayesEngine:
         # ZITTIAMO I LOG AUTOMATICI DI PGMPY
         logging.getLogger("pgmpy").setLevel(logging.ERROR)
 
-        # Definizione Struttura (Volume -> Volatilità -> Profitto)
+        # Struttura della Rete
         self.model = DiscreteBayesianNetwork([
             ('Volume_Cat', 'Vol_Cat'),
-            ('Vol_Cat', 'Profit_Cat')
+            ('Vol_Cat', 'Profit_Cat'),
+            ('Trend_Cat', 'Profit_Cat')
         ])
         
         # Preparazione dati
@@ -29,6 +30,7 @@ class BayesEngine:
             training_data['Volume_Cat'] = self.df['Volume_Cat'].astype(str).astype(object)
             training_data['Vol_Cat'] = self.df['Vol_Cat'].astype(str).astype(object)
             training_data['Profit_Cat'] = self.df['Profit_Cat'].astype(str).astype(object)
+            training_data['Trend_Cat'] = self.df['Trend_Cat'].astype(str).astype(object)
         except KeyError as e:
             print(f"ERRORE CRITICO: Manca la colonna {e} nel dataset!")
             return
@@ -38,7 +40,7 @@ class BayesEngine:
         
         assert self.model.check_model()
 
-    def inference(self, volume_state='High', vol_state='High_Vol'):
+    def inference(self, volume_state='Alto', vol_state='Agitata', trend_state='Rialzista'):
         """Esegue inferenza probabilistica."""
         if self.model is None:
             return
@@ -46,10 +48,14 @@ class BayesEngine:
         infer = VariableElimination(self.model)
         
         try:
-            # Query: Probabilità di Profitto data evidenza
+            # Query con etichette in Italiano
             q = infer.query(variables=['Profit_Cat'], 
-                            evidence={'Volume_Cat': volume_state, 'Vol_Cat': vol_state})
-            print(f"\nInferenza [Volume={volume_state}, Volatilità={vol_state}]:")
+                            evidence={
+                                'Volume_Cat': volume_state, 
+                                'Vol_Cat': vol_state,
+                                'Trend_Cat': trend_state
+                            })
+            print(f"\nInferenza [Volume={volume_state}, Volatilità={vol_state}, Trend={trend_state}]:")
             print(q)
         except Exception as e:
             print(f"Errore durante l'inferenza: {e}")
