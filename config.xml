@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <dataset>
+        <file_ohlc>data/FB.csv</file_ohlc>
+        <file_metrics>data/facebook-dataset.csv</file_metrics>
+    </dataset>
+    <parameters>
+        <kmeans_clusters>4</kmeans_clusters>
+        <test_size>0.2</test_size>
+        <volatility_threshold>0.03</volatility_threshold>
+    </parameters>
+    <output>
+        <facts_path>knowledge_base/facts.pl</facts_path>
+    </output>
+</configuration>
