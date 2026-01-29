@@ -62,31 +62,36 @@ def main():
     print("\n[Fase 3] Apprendimento Automatico")
     learner = Learner(df)
     
-    # Visualizzazioni EDA (Sez 1.1 Doc)
     learner.exploratory_analysis()
-    
     learner.plot_elbow_method()
     learner.unsupervised_clustering(k=config['parameters']['kmeans_clusters'])
     learner.supervised_classification()
     learner.supervised_regression()
     
-    # [Fase 4] Modelli Probabilistici (Sezione 4 Doc)
+    # [Fase 4] Modelli Probabilistici
     print("\n[Fase 4] Modelli Probabilistici")
     
-    # Otteniamo sia i dati discreti (per Sez 4.1) che quelli continui (per Sez 4.2)
     disc_df = engine.get_discrete_data()
-    
-    # Inizializza BayesEngine con ENTRAMBI i dataset
     bayes = BayesEngine(full_df=df, discrete_df=disc_df)
     
-    # --- 4.1 Rete Discreta ---
+    # --- 4.1 Rete Discreta: Analisi Multi-Scenario ---
     bayes.build_discrete_network()
-    bayes.inference_discrete(volume_state='Alto', vol_state='Agitata', trend_state='Rialzista')
+    
+    scenari = [
+        {"nome": "Scenario Originale (Volume Alto, Agitata, Rialzista)", "v": "Alto", "s": "Agitata", "t": "Rialzista"},
+        {"nome": "Scenario 2: Rally Calmo (Volume Medio, Calma, Rialzista)", "v": "Medio", "s": "Calma", "t": "Rialzista"},
+        {"nome": "Scenario 3: Panico (Volume Alto, Agitata, Ribassista)", "v": "Alto", "s": "Agitata", "t": "Ribassista"},
+        {"nome": "Scenario 4: Stasi (Volume Basso, Calma, Neutro)", "v": "Basso", "s": "Calma", "t": "Neutro"}
+    ]
+
+    for sc in scenari:
+        print(f"\n>>> {sc['nome']}")
+        # Chiamata al metodo del tuo BayesEngine
+        bayes.inference_discrete(volume_state=sc['v'], vol_state=sc['s'], trend_state=sc['t'])
     
     # --- 4.2 Rete Continua (Linear Gaussian) ---
     bayes.build_continuous_network()
     
-    # Inferenza Continua: Prendiamo l'ultimo giorno disponibile come input per test
     last_day = df.iloc[-1]
     bayes.inference_continuous(open_val=last_day['Open'], volume_val=last_day['Volume'])
 
