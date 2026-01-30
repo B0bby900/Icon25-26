@@ -41,7 +41,6 @@ class PrologManager:
 
     def query_patterns(self):
         """Esegue le query Prolog."""
-        # [CORREZIONE] Percorso esplicito alle regole statiche
         # Assume che rules.pl sia nella cartella knowledge_base come da struttura progetto
         base_dir = os.path.dirname(self.facts_file)
         rules_file = os.path.join(base_dir, 'rules.pl')
@@ -87,4 +86,5 @@ class PrologManager:
             except: pass
 
         except Exception as e:
+
             print(f"Errore Prolog: {e}")
